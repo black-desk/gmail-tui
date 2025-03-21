@@ -1,0 +1,43 @@
+# Default configuration for Gmail TUI
+# SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Gmail authentication configuration
+# email: Gmail email address
+# app_password: Google App Password
+# Note: Do not fill in actual credentials here, create a user config file instead
+gmail:
+  email: ""
+  app_password: ""
+
+# Key binding configuration
+# Format: key: action
+# key: Key or key combination (e.g., "ctrl+c")
+# action: Action name, must be one of the predefined actions
+bindings:
+  # Quit application
+  q: quit
+
+  # Refresh mail directories
+  r: refresh_directories
+
+  # Navigation
+  j: next
+  k: previous
+  g: top
+  G: bottom
+
+  # Mail operations
+  o: open
+  d: delete
+  a: archive
+  s: star
+  m: mark_read
+
+  # Search
+  "/": search
+  n: next_result
+  N: previous_result
+
+  # Help
+  "?": help 

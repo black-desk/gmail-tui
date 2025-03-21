@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[lint]
+# Enabled rule sets
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes errors
+    "I",    # isort errors
+    "N",    # pep8-naming errors
+    "W",    # pycodestyle warnings (includes W291-W293, W391 for trailing whitespace)
+    "B",    # flake8-bugbear errors
+    "D",    # pydocstyle errors
+    "UP",   # pyupgrade errors
+    "RUF",  # ruff-specific errors
+    "S",    # flake8-bandit security errors
+    "T10",  # flake8-debugger errors
+    "T20",  # flake8-print errors
+    "TID",  # flake8-tidy-imports errors
+    "ARG",  # flake8-unused-arguments errors
+    "PTH",  # flake8-use-pathlib errors
+    "ERA",  # eradicate errors
+    "PL",   # pylint errors
+]
+
+ignore = [
+    "D203", # one-blank-line-before-class (conflicts with D211)
+    "D213", # multi-line-summary-second-line (conflicts with D212)
+]
+
+[lint.isort]
+known-first-party = ["gmail_tui"]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+[format]
+quote-style = "double"
+line-ending = "lf"
+indent-style = "space"
+
+[lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]  # Ignore assert statement warnings in test files

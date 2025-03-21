@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[tool.poetry]
+name = "gmail-tui"
+version = "0.1.0"
+description = "A terminal user interface for Gmail"
+authors = ["Chen Linxuan <me@black-desk.cn>"]
+readme = "README.md"
+packages = [{ include = "gmail_tui", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+textual = "^2.1.2"
+xdg = "^6.0.0"
+pyyaml = "^6.0.2"
+imapclient = "^3.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+ruff = "^0.11.2"
+reuse = "^5.0.2"
+textual-dev = "^1.7.0"
+
+[tool.poetry.scripts]
+gmail-tui = "gmail_tui.__init__:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+src = [".ruff.toml"]
