@@ -1,0 +1,10 @@
+version = 1
+SPDX-PackageName = "gmail-tui"
+SPDX-PackageSupplier = "Chen Linxuan <me@black-desk.cn>"
+SPDX-PackageDownloadLocation = "https://github.com/black-desk/gmail-tui"
+
+[[annotations]]
+path = "poetry.lock"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Chen Linxuan <me@black-desk.cn>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
