@@ -12,6 +12,8 @@ packages = [{ include = "gmail_tui", from = "src" }]
 [tool.poetry.dependencies]
 python = "^3.9"
 textual = "^2.1.2"
+xdg = "^6.0.0"
+pyyaml = "^6.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
