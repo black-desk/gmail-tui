@@ -1,0 +1,35 @@
+# Gmail TUI 默认配置文件
+# SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# 快捷键绑定配置
+# 格式为 key: action
+# key: 按键，可以是单个字符或组合键（如 "ctrl+c"）
+# action: 动作名称，必须是预定义的动作之一
+bindings:
+  # 退出应用
+  q: quit
+
+  # 刷新邮件列表
+  r: refresh
+
+  # 导航
+  j: next
+  k: previous
+  g: top
+  G: bottom
+
+  # 邮件操作
+  o: open
+  d: delete
+  a: archive
+  s: star
+  m: mark_read
+
+  # 搜索
+  "/": search
+  n: next_result
+  N: previous_result
+
+  # 帮助
+  "?": help 
