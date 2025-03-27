@@ -2,6 +2,14 @@
 # SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# Gmail 认证配置
+# email: Gmail 邮箱地址
+# app_password: Google 应用专用密码
+# 注意：不要在此文件中填写实际的密码，应该创建用户配置文件
+gmail:
+  email: ""
+  app_password: ""
+
 # 快捷键绑定配置
 # 格式为 key: action
 # key: 按键，可以是单个字符或组合键（如 "ctrl+c"）

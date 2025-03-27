@@ -1,1 +1,23 @@
- 
+# Gmail 认证配置
+# 在此处填写您的 Gmail 邮箱和 Google 应用专用密码
+gmail:
+  email: "your.email@gmail.com"
+  app_password: "your-16-digit-app-password"
+
+# 快捷键绑定配置
+bindings:
+  q: quit
+  r: refresh
+  j: next
+  k: previous
+  g: top
+  G: bottom
+  o: open
+  d: delete
+  a: archive
+  s: star
+  m: mark_read
+  "/": search
+  n: next_result
+  N: previous_result
+  "?": help 
