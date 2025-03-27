@@ -7,23 +7,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
 import yaml
 from xdg import xdg_config_home, xdg_config_dirs
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 from .default import DEFAULT_CONFIG
-
-
-class GmailConfig(TypedDict):
-    """Gmail configuration."""
-
-    email: str
-    app_password: str
-
-
-class Config(TypedDict):
-    """Application configuration."""
-
-    gmail: GmailConfig
-    bindings: dict[str, str]
+from .types import Config
 
 
 def load_config() -> Config:
@@ -38,11 +25,11 @@ def load_config() -> Config:
         if config_file.exists():
             try:
                 with open(config_file) as f:
-                    config = yaml.safe_load(f)
-                    if config and "gmail" in config and "bindings" in config:
-                        return config
+                    config_data = yaml.safe_load(f)
+                    if config_data:
+                        return Config(config_data)
             except (yaml.YAMLError, OSError):
                 continue
 
     # If no valid user configuration is found, use default configuration
-    return yaml.safe_load(DEFAULT_CONFIG) 
+    return Config(yaml.safe_load(DEFAULT_CONFIG)) 
