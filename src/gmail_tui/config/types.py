@@ -39,14 +39,14 @@ class Config(TypedDict):
         if "bindings" not in data or not isinstance(data["bindings"], dict):
             raise ValueError("Configuration must contain 'bindings' section")
 
-        if "email" not in data["gmail"] or not isinstance(data["gmail"]["email"], str):
-            raise ValueError("Gmail configuration must contain 'email' field")
+        # Check Gmail credentials
+        gmail_config = data["gmail"]
+        if not isinstance(gmail_config.get("email"), str) or not gmail_config["email"]:
+            print("Gmail credentials not found in configuration.")
+            print("Please run 'gmail-tui init' to set up your credentials.")
+            sys.exit(1)
 
-        if "app_password" not in data["gmail"] or not isinstance(data["gmail"]["app_password"], str):
-            raise ValueError("Gmail configuration must contain 'app_password' field")
-
-        # Check if credentials are configured
-        if not data["gmail"]["email"] or not data["gmail"]["app_password"]:
+        if not isinstance(gmail_config.get("app_password"), str) or not gmail_config["app_password"]:
             print("Gmail credentials not found in configuration.")
             print("Please run 'gmail-tui init' to set up your credentials.")
             sys.exit(1)
