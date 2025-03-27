@@ -21,8 +21,16 @@ def temp_config_dir() -> Generator[Path, None, None]:
     """Create a temporary configuration directory."""
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
+        # 保存原始环境变量
+        original_xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
+        # 设置测试用的配置目录
         os.environ["XDG_CONFIG_HOME"] = str(temp_path)
         yield temp_path
+        # 恢复原始环境变量
+        if original_xdg_config_home is None:
+            os.environ.pop("XDG_CONFIG_HOME", None)
+        else:
+            os.environ["XDG_CONFIG_HOME"] = original_xdg_config_home
 
 
 def test_load_default_config(temp_config_dir: Path) -> None:
