@@ -28,7 +28,7 @@ class Config(TypedDict):
 
 def load_config() -> Config:
     """Load configuration from XDG config directories."""
-    # 首先尝试加载用户配置文件
+    # First try to load user configuration file
     config_dirs = [XDG_CONFIG_HOME / "gmail-tui"] + [
         Path(d) / "gmail-tui" for d in XDG_CONFIG_DIRS
     ]
@@ -44,5 +44,5 @@ def load_config() -> Config:
             except (yaml.YAMLError, OSError):
                 continue
 
-    # 如果没有找到有效的用户配置文件，使用默认配置
+    # If no valid user configuration is found, use default configuration
     return yaml.safe_load(DEFAULT_CONFIG) 
