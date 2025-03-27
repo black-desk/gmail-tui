@@ -7,15 +7,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
 import yaml
 from xdg import XDG_CONFIG_HOME, XDG_CONFIG_DIRS
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 from .default import DEFAULT_CONFIG
-from .actions import ACTIONS
 
 
-def load_config() -> dict[str, Any]:
+class GmailConfig(TypedDict):
+    """Gmail configuration."""
+
+    email: str
+    app_password: str
+
+
+class Config(TypedDict):
+    """Application configuration."""
+
+    gmail: GmailConfig
+    bindings: dict[str, str]
+
+
+def load_config() -> Config:
     """Load configuration from XDG config directories."""
-    config = yaml.safe_load(DEFAULT_CONFIG)
+    # 首先尝试加载用户配置文件
     config_dirs = [XDG_CONFIG_HOME / "gmail-tui"] + [
         Path(d) / "gmail-tui" for d in XDG_CONFIG_DIRS
     ]
@@ -25,16 +38,11 @@ def load_config() -> dict[str, Any]:
         if config_file.exists():
             try:
                 with open(config_file) as f:
-                    user_config = yaml.safe_load(f)
-                    if user_config and "bindings" in user_config:
-                        config["bindings"] = user_config["bindings"]
+                    config = yaml.safe_load(f)
+                    if config and "gmail" in config and "bindings" in config:
+                        return config
             except (yaml.YAMLError, OSError):
                 continue
 
-    # 添加动作描述
-    for binding in config["bindings"]:
-        action = binding["action"]
-        if action in ACTIONS:
-            binding["description"] = ACTIONS[action]["description"]
-
-    return config 
+    # 如果没有找到有效的用户配置文件，使用默认配置
+    return yaml.safe_load(DEFAULT_CONFIG) 
