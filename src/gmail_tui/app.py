@@ -4,7 +4,8 @@ SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
-from typing import ClassVar
+import sys
+from typing import ClassVar, NoReturn
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -12,6 +13,13 @@ from textual.widgets import Footer, Header, Label
 
 from .config.loader import load_config
 from .config.types import ActionInfo, Config
+
+
+def print_init_message() -> NoReturn:
+    """Print initialization message and exit."""
+    print("Gmail credentials not found in configuration.")
+    print("Please run 'gmail-tui init' to set up your credentials.")
+    sys.exit(1)
 
 
 class GmailTUI(App):
@@ -25,6 +33,10 @@ class GmailTUI(App):
         """Initialize the application."""
         # Load configuration before initializing the app
         self.config = load_config()
+
+        # Check if credentials are configured
+        if not self.config["gmail"]["email"] or not self.config["gmail"]["app_password"]:
+            print_init_message()
 
         # Set up key bindings from configuration
         bindings = []
