@@ -5,7 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 """
 
 import yaml
-from xdg import XDG_CONFIG_HOME, XDG_CONFIG_DIRS
+from xdg import xdg_config_home, xdg_config_dirs
 from pathlib import Path
 from typing import Any, TypedDict
 
@@ -29,8 +29,8 @@ class Config(TypedDict):
 def load_config() -> Config:
     """Load configuration from XDG config directories."""
     # First try to load user configuration file
-    config_dirs = [XDG_CONFIG_HOME / "gmail-tui"] + [
-        Path(d) / "gmail-tui" for d in XDG_CONFIG_DIRS
+    config_dirs = [Path(xdg_config_home()) / "gmail-tui"] + [
+        Path(d) / "gmail-tui" for d in xdg_config_dirs()
     ]
 
     for config_dir in config_dirs:
