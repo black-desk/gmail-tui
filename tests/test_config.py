@@ -40,7 +40,8 @@ def test_load_default_config(temp_config_dir: Path) -> None:
     assert "bindings" in config
     assert config["gmail"]["email"] == ""
     assert config["gmail"]["app_password"] == ""
-    assert "quit" in config["bindings"]
+    assert "q" in config["bindings"]
+    assert config["bindings"]["q"] == "quit"
 
 
 def test_load_user_config(temp_config_dir: Path) -> None:
@@ -75,8 +76,8 @@ def test_load_user_config(temp_config_dir: Path) -> None:
 
 def test_init_config(temp_config_dir: Path) -> None:
     """Test configuration initialization."""
-    # Initialize config
-    init_config()
+    # Initialize config with test values
+    init_config(email="test@gmail.com", app_password="test-password")
 
     # Check if config file was created
     config_file = temp_config_dir / "gmail-tui" / "config.yaml"
@@ -87,9 +88,10 @@ def test_init_config(temp_config_dir: Path) -> None:
         config = yaml.safe_load(f)
         assert "gmail" in config
         assert "bindings" in config
-        assert config["gmail"]["email"] == ""
-        assert config["gmail"]["app_password"] == ""
-        assert "quit" in config["bindings"]
+        assert config["gmail"]["email"] == "test@gmail.com"
+        assert config["gmail"]["app_password"] == "test-password"
+        assert "q" in config["bindings"]
+        assert config["bindings"]["q"] == "quit"
 
 
 def test_init_config_existing(temp_config_dir: Path) -> None:
@@ -113,7 +115,7 @@ def test_init_config_existing(temp_config_dir: Path) -> None:
         yaml.dump(existing_config, f)
 
     # Initialize config
-    init_config()
+    init_config(email="new@gmail.com", app_password="new-password")
 
     # Verify config was not changed
     with open(config_file) as f:
