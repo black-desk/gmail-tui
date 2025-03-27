@@ -11,11 +11,15 @@ from textual.binding import Binding
 from textual.widgets import Footer, Header, Label
 
 from .config.loader import load_config
-from .config.actions import Action, ACTION_DESCRIPTIONS
+from .config.types import ActionInfo
 
 
 class GmailTUI(App):
     """A simple Gmail TUI application."""
+
+    ACTIONS: ClassVar[dict[str, ActionInfo]] = {
+        "quit": ActionInfo("quit", "Quit"),
+    }
 
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
@@ -27,11 +31,9 @@ class GmailTUI(App):
         """Set up the application on mount."""
         config = load_config()
         for key, action_name in config["bindings"].items():
-            try:
-                action = Action(action_name)
-                self.bind(key, action.value, ACTION_DESCRIPTIONS[action])
-            except ValueError:
-                continue  # 忽略无效的动作名称
+            if action_name in self.ACTIONS:
+                action_info = self.ACTIONS[action_name]
+                self.bind(key, action_info.name, action_info.description)
 
 
 def main() -> None:
