@@ -11,7 +11,7 @@ from textual.binding import Binding
 from textual.widgets import Footer, Header, Label
 
 from .config.loader import load_config
-from .config.types import ActionInfo
+from .config.types import ActionInfo, Config
 
 
 class GmailTUI(App):
@@ -21,19 +21,26 @@ class GmailTUI(App):
         "quit": ActionInfo("quit", "Quit"),
     }
 
+    def __init__(self) -> None:
+        """Initialize the application."""
+        # Load configuration before initializing the app
+        self.config = load_config()
+
+        # Set up key bindings from configuration
+        bindings = []
+        for key, action_name in self.config["bindings"].items():
+            if action_name in self.ACTIONS:
+                action_info = self.ACTIONS[action_name]
+                bindings.append(Binding(key, action_info.name, action_info.description))
+
+        # Initialize the app with configured bindings
+        super().__init__(bindings=bindings)
+
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
         yield Header()
         yield Label("Hello World")
         yield Footer()
-
-    def on_mount(self) -> None:
-        """Set up the application on mount."""
-        config = load_config()
-        for key, action_name in config["bindings"].items():
-            if action_name in self.ACTIONS:
-                action_info = self.ACTIONS[action_name]
-                self.bind(key, action_info.name, action_info.description)
 
 
 def main() -> None:
