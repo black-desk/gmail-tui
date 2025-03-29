@@ -10,7 +10,7 @@ import sys
 from gmail_tui.commands.base import Command
 from gmail_tui.config import get_config
 from gmail_tui.imap_tree import IMAPTree
-from gmail_tui.utils import connect_imap
+from gmail_tui.utils import get_imap_connection
 
 
 class TreeCommand(Command):
@@ -44,7 +44,7 @@ class TreeCommand(Command):
         """
         config = get_config()
         try:
-            with connect_imap(
+            with get_imap_connection(
                 username=config.email, password=config.app_password
             ) as client:
                 folders = client.list_folders()

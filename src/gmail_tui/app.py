@@ -12,6 +12,7 @@ from textual.containers import Container, Horizontal
 from textual.widgets import Footer, Header
 
 from gmail_tui.config import get_config
+from gmail_tui.utils import close_all_imap_connections
 from gmail_tui.widgets.email_list import EmailList
 from gmail_tui.widgets.folder_tree import FolderTree
 
@@ -77,6 +78,11 @@ class GmailTUI(App):
         )
         yield Footer()
 
+    def on_unmount(self) -> None:
+        """Handle application unmount."""
+        # Close all IMAP connections when the app exits
+        close_all_imap_connections()
+
     @on(FolderTree.FolderSelected)
     def on_folder_tree_folder_selected(
         self, message: FolderTree.FolderSelected
@@ -94,6 +100,12 @@ class GmailTUI(App):
         """Refresh action."""
         self.folder_tree.action_refresh_directories()
         self.email_list.action_refresh()
+
+    def action_quit(self) -> None:
+        """Quit the application."""
+        # Make sure to close all IMAP connections before quitting
+        close_all_imap_connections()
+        self.exit()
 
 
 def main() -> None:

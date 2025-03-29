@@ -115,17 +115,17 @@ def test_list_emails_functionality(mock_config, mock_imap_client):
     # Mock functions
     with (
         patch("gmail_tui.list.get_config", return_value=mock_config),
-        patch("gmail_tui.list.connect_imap") as mock_connect_imap,
+        patch("gmail_tui.list.get_imap_connection") as mock_get_imap_connection,
         patch("sys.stdout.write") as mock_stdout_write,
     ):
         # Set up connection mock
-        mock_connect_imap.return_value.__enter__.return_value = mock_imap_client
+        mock_get_imap_connection.return_value.__enter__.return_value = mock_imap_client
 
         # Call function
         list_emails("INBOX", 10, "json")
 
         # Verify IMAP connection parameters are correct
-        mock_connect_imap.assert_called_once_with(
+        mock_get_imap_connection.assert_called_once_with(
             username=mock_config.email, password=mock_config.app_password
         )
 
@@ -149,16 +149,16 @@ def test_list_emails_no_emails(mock_config, mock_imap_client):
     # Mock functions
     with (
         patch("gmail_tui.list.get_config", return_value=mock_config),
-        patch("gmail_tui.list.connect_imap") as mock_connect_imap,
+        patch("gmail_tui.list.get_imap_connection") as mock_get_imap_connection,
         patch("sys.stdout.write") as mock_stdout_write,
     ):
         # Set up connection mock
-        mock_connect_imap.return_value.__enter__.return_value = mock_imap_client
+        mock_get_imap_connection.return_value.__enter__.return_value = mock_imap_client
 
         # Call function
-        list_emails("INBOX", 10, "json")
+        list_emails("INBOX")
 
-        # Verify correct message was written to stdout
+        # Verify correct message is displayed
         mock_stdout_write.assert_called_once_with("No emails found in folder: INBOX\n")
 
 
@@ -170,16 +170,16 @@ def test_list_emails_connection_error(mock_config):
     # Mock functions
     with (
         patch("gmail_tui.list.get_config", return_value=mock_config),
-        patch("gmail_tui.list.connect_imap") as mock_connect_imap,
+        patch("gmail_tui.list.get_imap_connection") as mock_get_imap_connection,
         patch("sys.stderr.write") as mock_stderr_write,
     ):
         # Set connection to raise exception
-        mock_connect_imap.side_effect = Exception("Connection error")
+        mock_get_imap_connection.side_effect = Exception("Connection error")
 
         # Call function
-        list_emails("INBOX", 10, "json")
+        list_emails("INBOX")
 
-        # Verify error message was written to stderr
+        # Verify error message was written
         mock_stderr_write.assert_called_once_with("Error: Connection error\n")
 
 
@@ -208,14 +208,14 @@ def test_list_emails_output_formats(mock_config, mock_imap_client, output_format
     # Mock functions
     with (
         patch("gmail_tui.list.get_config", return_value=mock_config),
-        patch("gmail_tui.list.connect_imap") as mock_connect_imap,
+        patch("gmail_tui.list.get_imap_connection") as mock_get_imap_connection,
         patch("sys.stdout.write") as mock_stdout_write,
     ):
         # Set up connection mock
-        mock_connect_imap.return_value.__enter__.return_value = mock_imap_client
+        mock_get_imap_connection.return_value.__enter__.return_value = mock_imap_client
 
         # Call function
-        list_emails("INBOX", 10, output_format)
+        list_emails("INBOX", 1, output_format)
 
         # Verify output was written to stdout
         assert mock_stdout_write.call_count >= 1

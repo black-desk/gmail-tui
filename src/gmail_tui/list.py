@@ -1,4 +1,4 @@
-"""List module for Gmail TUI.
+"""List command implementation.
 
 SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
 SPDX-License-Identifier: GPL-3.0-or-later
@@ -13,7 +13,7 @@ import yaml
 
 from gmail_tui.config import get_config
 from gmail_tui.email import EmailMetadata
-from gmail_tui.utils import connect_imap, fetch_email_metadata
+from gmail_tui.utils import fetch_email_metadata, get_imap_connection
 
 
 class OutputFormat(Enum):
@@ -87,8 +87,8 @@ def list_emails(folder: str, limit: int = 20, output_format: str = "json") -> No
         # Get configuration
         config = get_config()
 
-        # Connect to IMAP server
-        with connect_imap(
+        # Connect to IMAP server using connection manager
+        with get_imap_connection(
             username=config.email, password=config.app_password
         ) as client:
             # Fetch email metadata

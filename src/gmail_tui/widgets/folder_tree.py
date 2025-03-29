@@ -193,7 +193,7 @@ class FolderTree(Widget):
         if not self.email or not self.app_password:
             return
 
-        # Connect to IMAP server
+        # Connect to IMAP server - connection will be reused from pool if available
         client = connect_imap(username=self.email, password=self.app_password)
 
         try:
@@ -202,9 +202,9 @@ class FolderTree(Widget):
 
             # Post update message
             self.post_message(self.FoldersUpdated(folders))
-        finally:
-            # Clean up
-            client.logout()
+        except Exception:
+            # No need to close the connection as it's managed by the connection pool
+            raise
 
     def on_mount(self) -> None:
         """Handle widget mount event."""
