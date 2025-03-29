@@ -37,14 +37,14 @@ jobs:
         echo "Checking for trailing whitespace in text files..."
         # First check common text file types that we explicitly want to check
         FILES_WITH_TRAILING_SPACE=$(find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.toml" -o -name "*.json" -o -name "*.txt" -o -name "*.css" -o -name "*.html" -o -name "*.js" -o -name "*.sh" -o -name "*.conf" -o -name "*.ini" \) -exec grep -l "[[:blank:]]$" {} \;)
-        
+
         # Additionally check if any file is a text file using file command
         # and check them for trailing whitespace
         OTHER_TEXT_FILES=$(find . -type f -not -path "*/\.*" -not -path "*/venv/*" -not -path "*/__pycache__/*" -exec file {} \; | grep text | cut -d: -f1 | xargs grep -l "[[:blank:]]$" 2>/dev/null || true)
-        
+
         # Combine both results
         ALL_FILES_WITH_TRAILING_SPACE=$(echo "$FILES_WITH_TRAILING_SPACE $OTHER_TEXT_FILES" | tr ' ' '\n' | sort | uniq)
-        
+
         if [ -n "$ALL_FILES_WITH_TRAILING_SPACE" ]; then
           echo "Found trailing whitespace in these files:"
           echo "$ALL_FILES_WITH_TRAILING_SPACE"

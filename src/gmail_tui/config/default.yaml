@@ -40,4 +40,4 @@ bindings:
   N: previous_result
 
   # Help
-  "?": help 
+  "?": help
