@@ -43,14 +43,14 @@ def check_file_for_trailing_whitespace(file_path: Path) -> list[tuple[int, str]]
         List of (line_number, line_content) pairs with trailing whitespace
 
     """
-    trailing_whitespace_pattern = re.compile(r'[ \t]+$')
+    trailing_whitespace_pattern = re.compile(r"[ \t]+$")
     results = []
 
     try:
         with file_path.open(encoding="utf-8") as f:
             for line_num, line in enumerate(f, 1):
                 if trailing_whitespace_pattern.search(line):
-                    results.append((line_num, line.rstrip('\n')))
+                    results.append((line_num, line.rstrip("\n")))
     except Exception as e:
         print(f"Error reading {file_path}: {e}", file=sys.stderr)  # noqa: T201
 
@@ -67,7 +67,7 @@ def remove_trailing_whitespace(file_path: Path) -> int:
         Number of lines modified
 
     """
-    trailing_whitespace_pattern = re.compile(r'[ \t]+$')
+    trailing_whitespace_pattern = re.compile(r"[ \t]+$")
     modified_lines = 0
 
     try:
@@ -76,7 +76,7 @@ def remove_trailing_whitespace(file_path: Path) -> int:
 
         with file_path.open("w", encoding="utf-8") as f:
             for line in lines:
-                new_line, count = trailing_whitespace_pattern.subn('', line)
+                new_line, count = trailing_whitespace_pattern.subn("", line)
                 if count > 0:
                     modified_lines += 1
                 f.write(new_line)
@@ -97,43 +97,44 @@ def main() -> int:
         description="Check for and remove trailing whitespace in text files"
     )
     parser.add_argument(
-        'directory',
-        nargs='?',
-        default='.',
-        help='Directory to search (default: current directory)'
+        "directory",
+        nargs="?",
+        default=".",
+        help="Directory to search (default: current directory)",
     )
     parser.add_argument(
-        '--fix',
-        action='store_true',
-        help='Fix trailing whitespace issues by removing them'
+        "--fix",
+        action="store_true",
+        help="Fix trailing whitespace issues by removing them",
     )
     parser.add_argument(
-        '--extensions',
-        default='.py,.md,.yml,.yaml,.toml,.json,.txt,.html,.css,.js,.sh,.conf,.ini',
-        help='Comma-separated list of file extensions to check (default: '
-             '.py,.md,.yml,.yaml,.toml,.json,.txt,.html,.css,.js,.sh,.conf,.ini)'
+        "--extensions",
+        default=".py,.md,.yml,.yaml,.toml,.json,.txt,.html,.css,.js,.sh,.conf,.ini",
+        help="Comma-separated list of file extensions to check (default: "
+        ".py,.md,.yml,.yaml,.toml,.json,.txt,.html,.css,.js,.sh,.conf,.ini)",
     )
     parser.add_argument(
-        '--exclude',
-        default='.git,__pycache__,venv,.venv,dist,build,.pytest_cache,.ruff_cache',
-        help='Comma-separated list of directories to exclude (default: '
-             '.git,__pycache__,venv,.venv,dist,build,.pytest_cache,.ruff_cache)'
+        "--exclude",
+        default=".git,__pycache__,venv,.venv,dist,build,.pytest_cache,.ruff_cache",
+        help="Comma-separated list of directories to exclude (default: "
+        ".git,__pycache__,venv,.venv,dist,build,.pytest_cache,.ruff_cache)",
     )
 
     args = parser.parse_args()
     directory = Path(args.directory)
-    extensions = args.extensions.split(',')
-    exclude_dirs = args.exclude.split(',')
+    extensions = args.extensions.split(",")
+    exclude_dirs = args.exclude.split(",")
 
     # Convert extensions to include dot prefix if needed
-    extensions = [ext if ext.startswith('.') else f'.{ext}' for ext in extensions]
+    extensions = [ext if ext.startswith(".") else f".{ext}" for ext in extensions]
 
     # Find text files
     text_files = find_text_files(directory, extensions)
 
     # Filter out excluded directories
     text_files = [
-        f for f in text_files
+        f
+        for f in text_files
         if not any(exclude_dir in str(f) for exclude_dir in exclude_dirs)
     ]
 

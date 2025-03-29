@@ -93,7 +93,7 @@ def test_list_emails_functionality(mock_config, mock_imap_client):
                 b"Test Email 1",
                 from_addr,
                 to_addr,
-                message_id=b"<message1@example.com>"
+                message_id=b"<message1@example.com>",
             ),
             b"RFC822.SIZE": 1024,
             b"INTERNALDATE": datetime.now(),
@@ -104,7 +104,7 @@ def test_list_emails_functionality(mock_config, mock_imap_client):
                 b"Test Email 2",
                 from_addr,
                 to_addr,
-                message_id=b"<message2@example.com>"
+                message_id=b"<message2@example.com>",
             ),
             b"RFC822.SIZE": 2048,
             b"INTERNALDATE": datetime.now(),
@@ -198,11 +198,7 @@ def test_list_emails_output_formats(mock_config, mock_imap_client, output_format
 
     mock_imap_client.fetch.return_value = {
         1: {
-            b"ENVELOPE": create_envelope(
-                b"Test Email Format",
-                from_addr,
-                to_addr
-            ),
+            b"ENVELOPE": create_envelope(b"Test Email Format", from_addr, to_addr),
             b"RFC822.SIZE": 1024,
             b"INTERNALDATE": datetime.now(),
             b"FLAGS": (b"\\Seen",),
