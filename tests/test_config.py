@@ -7,14 +7,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
 import os
 import sys
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import pytest
 import yaml
 
-from gmail_tui.config.loader import get_config
 from gmail_tui.config.init import init_config
+from gmail_tui.config.loader import get_config
 from gmail_tui.config.types import Config
 
 
@@ -59,7 +59,7 @@ def test_load_default_config(temp_config_dir: Path) -> None:
 
     config = get_config()
     assert config.email == "test@gmail.com"
-    assert config.app_password == "test-password"
+    assert config.app_password == "test-password"  # noqa: S105
 
 
 def test_load_user_config(temp_config_dir: Path) -> None:
@@ -83,13 +83,13 @@ def test_load_user_config(temp_config_dir: Path) -> None:
     # Load config
     config = get_config()
     assert config.email == "test@gmail.com"
-    assert config.app_password == "test-password"
+    assert config.app_password == "test-password"  # noqa: S105
 
 
 def test_init_config(temp_config_dir: Path) -> None:
     """Test configuration initialization."""
     # Initialize config with test values
-    init_config(email="test@gmail.com", app_password="test-password")
+    init_config(email="test@gmail.com", app_password="test-password")  # noqa: S106
 
     # Check if config file was created
     config_file = temp_config_dir / "gmail-tui" / "config.yaml"
@@ -100,7 +100,7 @@ def test_init_config(temp_config_dir: Path) -> None:
         config = yaml.safe_load(f)
         assert "gmail" in config
         assert config["gmail"]["email"] == "test@gmail.com"
-        assert config["gmail"]["app_password"] == "test-password"
+        assert config["gmail"]["app_password"] == "test-password"  # noqa: S105
 
 
 def test_init_config_existing(temp_config_dir: Path) -> None:
@@ -121,13 +121,13 @@ def test_init_config_existing(temp_config_dir: Path) -> None:
         yaml.dump(existing_config, f)
 
     # Initialize config
-    init_config(email="new@gmail.com", app_password="new-password")
+    init_config(email="new@gmail.com", app_password="new-password")  # noqa: S106
 
     # Verify config was not changed
     with config_file.open() as f:
         config = yaml.safe_load(f)
         assert config["gmail"]["email"] == "test@gmail.com"
-        assert config["gmail"]["app_password"] == "test-password"
+        assert config["gmail"]["app_password"] == "test-password"  # noqa: S105
 
 
 def test_invalid_config_format() -> None:
@@ -166,6 +166,7 @@ def test_cli_init_command(temp_config_dir: Path) -> None:
             "test-password",
         ]
         from gmail_tui import main
+
         main()
 
         # Verify config was created
@@ -176,7 +177,7 @@ def test_cli_init_command(temp_config_dir: Path) -> None:
         with config_file.open() as f:
             config = yaml.safe_load(f)
             assert config["gmail"]["email"] == "test@gmail.com"
-            assert config["gmail"]["app_password"] == "test-password"
+            assert config["gmail"]["app_password"] == "test-password"  # noqa: S105
 
     finally:
         # Restore original sys.argv

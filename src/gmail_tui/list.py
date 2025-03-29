@@ -43,8 +43,8 @@ class OutputFormat(Enum):
                 "yaml": cls.YAML,
                 "toml": cls.TOML,
             }[s.lower()]
-        except KeyError:
-            raise ValueError(f"Invalid format: {s}")
+        except KeyError as err:
+            raise ValueError(f"Invalid format: {s}") from err
 
 
 def format_output(emails: list[EmailMetadata], output_format: OutputFormat) -> str:
@@ -88,19 +88,21 @@ def list_emails(folder: str, limit: int = 20, output_format: str = "json") -> No
         config = get_config()
 
         # Connect to IMAP server
-        with connect_imap(username=config.email, password=config.app_password) as client:
+        with connect_imap(
+            username=config.email, password=config.app_password
+        ) as client:
             # Fetch email metadata
             emails = fetch_email_metadata(client, folder, limit)
 
             # Check if we got any emails
             if not emails:
-                print(f"No emails found in folder: {folder}")
+                sys.stdout.write(f"No emails found in folder: {folder}\n")
                 return
 
             # Format and print output
             formatted_output = format_output(emails, fmt)
-            print(formatted_output)
+            sys.stdout.write(f"{formatted_output}\n")
     except ValueError as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.stderr.write(f"Error: {e!s}\n")
     except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.stderr.write(f"Error: {e!s}\n")

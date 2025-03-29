@@ -35,11 +35,11 @@ class TreeCommand(Command):
         """
         subparsers.add_parser(self.name, help=self.help)
 
-    def handle(self, args: argparse.Namespace) -> None:
+    def handle(self, _: argparse.Namespace) -> None:
         """Handle the command.
 
         Args:
-            args: The parsed arguments
+            _: The parsed arguments (unused)
 
         """
         config = get_config()
@@ -49,10 +49,10 @@ class TreeCommand(Command):
             ) as client:
                 folders = client.list_folders()
                 if not folders:
-                    print("No folders found")
+                    sys.stdout.write("No folders found\n")
                     return
 
                 tree = IMAPTree(folders)
                 tree.print_tree()
         except Exception as e:
-            print(f"Error: {str(e)}", file=sys.stderr)
+            sys.stderr.write(f"Error: {e!s}\n")

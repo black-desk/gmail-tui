@@ -4,6 +4,7 @@ SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
+import sys
 from collections import defaultdict
 
 
@@ -53,15 +54,15 @@ class IMAPTree:
         tree: dict[str, set[str]] = defaultdict(set)
         root_folders = set()
 
-        for _, _, name in folders:
-            name = self._decode_flag(name)
-            parts = name.split(self.delimiter)
+        for _, _, folder_name in folders:
+            decoded_name = self._decode_flag(folder_name)
+            parts = decoded_name.split(self.delimiter)
 
             if len(parts) == 1:
-                root_folders.add(name)
+                root_folders.add(decoded_name)
             else:
                 parent = self.delimiter.join(parts[:-1])
-                tree[parent].add(name)
+                tree[parent].add(decoded_name)
 
         tree[""] = root_folders
         return tree
@@ -86,7 +87,8 @@ class IMAPTree:
             else:
                 current = folder.split(self.delimiter)[-1]
 
-            print(f"{prefix}{'└── ' if is_last else '├── '}{current}")
+            output = f"{prefix}{'└── ' if is_last else '├── '}{current}"
+            sys.stdout.write(f"{output}\n")
 
             if folder in self.tree:
                 self._print_node(folder, prefix + ("    " if is_last else "│   "))

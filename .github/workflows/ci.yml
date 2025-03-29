@@ -5,59 +5,47 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main]
   pull_request:
-    branches: [ main, master ]
+    branches: [main]
 
 jobs:
-  lint-and-test:
+  test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: poetry
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.7.1
+        virtualenvs-create: true
+        virtualenvs-in-project: true
 
     - name: Install dependencies
       run: poetry install
 
-    - name: Check for trailing whitespace in all text files
+    - name: Check for trailing whitespace
+      run: poetry run python scripts/check_trailing_whitespace.py
+
+    - name: Run formatters
       run: |
-        echo "Checking for trailing whitespace in text files..."
-        # First check common text file types that we explicitly want to check
-        FILES_WITH_TRAILING_SPACE=$(find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.toml" -o -name "*.json" -o -name "*.txt" -o -name "*.css" -o -name "*.html" -o -name "*.js" -o -name "*.sh" -o -name "*.conf" -o -name "*.ini" \) -exec grep -l "[[:blank:]]$" {} \;)
+        poetry run ruff format --check .
 
-        # Additionally check if any file is a text file using file command
-        # and check them for trailing whitespace
-        OTHER_TEXT_FILES=$(find . -type f -not -path "*/\.*" -not -path "*/venv/*" -not -path "*/__pycache__/*" -exec file {} \; | grep text | cut -d: -f1 | xargs grep -l "[[:blank:]]$" 2>/dev/null || true)
-
-        # Combine both results
-        ALL_FILES_WITH_TRAILING_SPACE=$(echo "$FILES_WITH_TRAILING_SPACE $OTHER_TEXT_FILES" | tr ' ' '\n' | sort | uniq)
-
-        if [ -n "$ALL_FILES_WITH_TRAILING_SPACE" ]; then
-          echo "Found trailing whitespace in these files:"
-          echo "$ALL_FILES_WITH_TRAILING_SPACE"
-          exit 1
-        else
-          echo "No trailing whitespace found."
-        fi
-
-    - name: Format check
-      run: poetry run ruff format --check .
-
-    - name: Code style check
-      run: poetry run ruff check .
+    - name: Run linters
+      run: |
+        poetry run ruff check .
 
     - name: Run tests
-      run: poetry run pytest
+      run: |
+        poetry run pytest

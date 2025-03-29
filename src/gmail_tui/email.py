@@ -1,6 +1,6 @@
 """Email module for Gmail TUI.
 
-SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black_desk.cn>
+SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
@@ -11,6 +11,8 @@ from email.header import decode_header
 from typing import Any, Optional
 
 from imapclient import IMAPClient
+
+ADDRESS_TUPLE_MIN_LENGTH = 4
 
 
 def decode_mime_words(s: Optional[str]) -> str:
@@ -37,14 +39,14 @@ def decode_mime_words(s: Optional[str]) -> str:
     return "".join(result)
 
 
-def format_address_list(addresses: Optional[list[Any]]) -> Optional[str]:
-    """Format a list of email addresses from ENVELOPE format.
+def format_address_list(addresses: list | None) -> str | None:
+    """Format an address list to a string representation.
 
     Args:
-        addresses: List of address objects or tuples
+        addresses: List of email addresses in various formats
 
     Returns:
-        Formatted email address string or None if empty
+        Formatted address string or None if empty
 
     """
     if not addresses:
@@ -62,7 +64,9 @@ def format_address_list(addresses: Optional[list[Any]]) -> Optional[str]:
             name = address.name
             mailbox = address.mailbox
             host = address.host
-        elif isinstance(address, (list, tuple)) and len(address) >= 4:
+        elif isinstance(address, (list, tuple)) and len(address) >= (
+            ADDRESS_TUPLE_MIN_LENGTH
+        ):
             # Process tuple format (name, host_route, mailbox, host)
             name, _, mailbox, host = address
         else:

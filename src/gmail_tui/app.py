@@ -4,7 +4,6 @@ SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black_desk.cn>
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
-
 from typing import ClassVar
 
 from textual import on, work

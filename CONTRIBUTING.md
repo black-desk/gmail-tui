@@ -69,7 +69,12 @@ This project follows the [REUSE Specification](https://reuse.software/spec/) for
    poetry run ruff check .
    ```
 
-6. Verify license compliance:
+6. Check for trailing whitespace:
+   ```bash
+   poetry run python scripts/check_trailing_whitespace.py
+   ```
+
+7. Verify license compliance:
    ```bash
    git clean -fdx
    poetry run reuse lint
@@ -80,6 +85,7 @@ This project follows the [REUSE Specification](https://reuse.software/spec/) for
 This project uses GitHub Actions for continuous integration. The following checks are run on every pull request and push to the main branch:
 
 1. **CI Workflow**: Runs on multiple Python versions and performs:
+   - Trailing whitespace checks
    - Formatting checks
    - Code style checks
    - Unit tests
@@ -97,6 +103,7 @@ For local development, make sure to run the same checks before submitting a pull
 
 ```bash
 # Run all checks
+poetry run python scripts/check_trailing_whitespace.py
 poetry run ruff format --check .
 poetry run ruff check .
 poetry run pytest
