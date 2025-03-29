@@ -6,6 +6,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 import sys
 from collections import defaultdict
+from typing import Union
 
 
 class IMAPTree:
@@ -25,7 +26,7 @@ class IMAPTree:
         self.tree = self._build_tree(folders)
 
     @staticmethod
-    def _decode_flag(flag: bytes | str) -> str:
+    def _decode_flag(flag: Union[bytes, str]) -> str:
         """Decode IMAP flag.
 
         Args:

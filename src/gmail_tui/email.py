@@ -39,7 +39,7 @@ def decode_mime_words(s: Optional[str]) -> str:
     return "".join(result)
 
 
-def format_address_list(addresses: list | None) -> str | None:
+def format_address_list(addresses: Optional[list]) -> Optional[str]:
     """Format an address list to a string representation.
 
     Args:
