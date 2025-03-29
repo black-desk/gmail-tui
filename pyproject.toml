@@ -15,6 +15,7 @@ textual = "^2.1.2"
 xdg = "^6.0.0"
 pyyaml = "^6.0.2"
 imapclient = "^3.0.1"
+toml = "^0.10.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
