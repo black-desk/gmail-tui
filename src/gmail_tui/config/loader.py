@@ -5,6 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 """
 
 import logging
+from typing import Optional
 
 import yaml
 from xdg import xdg_config_dirs, xdg_config_home
@@ -12,7 +13,7 @@ from xdg import xdg_config_dirs, xdg_config_home
 from .default import DEFAULT_CONFIG
 from .types import Config
 
-_config: Config | None = None
+_config: Optional[Config] = None
 
 
 def get_config() -> Config:
