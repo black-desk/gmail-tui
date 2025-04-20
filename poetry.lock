@@ -1279,14 +1279,14 @@ typing-extensions = ">=4.4.0,<5.0.0"
 
 [[package]]
 name = "textual-serve"
-version = "1.1.1"
+version = "1.1.2"
 description = "Turn your Textual TUIs in to web applications"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "textual_serve-1.1.1-py3-none-any.whl", hash = "sha256:568782f1c0e60e3f7039d9121e1cb5c2f4ca1aaf6d6bd7aeb833d5763a534cb2"},
-    {file = "textual_serve-1.1.1.tar.gz", hash = "sha256:71c662472c462e5e368defc660ee6e8eae3bfda88ca40c050c55474686eb0c54"},
+    {file = "textual_serve-1.1.2-py3-none-any.whl", hash = "sha256:147d56b165dccf2f387203fe58d43ce98ccad34003fe3d38e6d2bc8903861865"},
+    {file = "textual_serve-1.1.2.tar.gz", hash = "sha256:0ccaf9b9df9c08d4b2d7a0887cad3272243ba87f68192c364f4bed5b683e4bd4"},
 ]
 
 [package.dependencies]
