@@ -91,8 +91,8 @@ def list_emails(folder: str, limit: int = 20, output_format: str = "json") -> No
         with get_imap_connection(
             username=config.email, password=config.app_password
         ) as client:
-            # Fetch email metadata
-            emails = fetch_email_metadata(client, folder, limit)
+            # Fetch email metadata (skip login for smtp4dev)
+            emails = fetch_email_metadata(client, folder, limit, login=False)
 
             # Check if we got any emails
             if not emails:

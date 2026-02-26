@@ -1,4 +1,4 @@
-<!-- SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn> -->
+<!-- SPDX-FileCopyrightText: 2024-2026 Chen Linxuan <me@black-desk.cn> -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
 # Gmail TUI
@@ -11,8 +11,24 @@ A terminal user interface for Gmail, built with Python and Textual.
 
 ## Features
 
+- **Dual Interface**: Both interactive TUI and command-line interface (CLI)
 - Modern terminal user interface
 - Keyboard-driven interface
+
+## Architecture
+
+This project provides two interfaces:
+
+- **TUI mode**: Interactive terminal user interface (run `gmail-tui`)
+- **CLI mode**: Command-line subcommands for scripting and automation
+
+Both interfaces share the same business logic layer. **CLI commands are preferred for implementing new features** because:
+
+1. They are easier to test programmatically
+2. They allow validating business logic without UI complexity
+3. TUI widgets can then simply call the same underlying functions
+
+When adding new functionality, implement the core logic in a way that can be used by both CLI and TUI.
 
 ## Installation
 

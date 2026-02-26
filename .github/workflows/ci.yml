@@ -17,6 +17,14 @@ jobs:
       matrix:
         python-version: ["3.14"]
 
+    services:
+      smtp4dev:
+        image: rnwood/smtp4dev:latest
+        ports:
+          - 143:143  # IMAP
+          - 25:25    # SMTP
+          - 8080:8080  # Web UI
+
     steps:
     - uses: actions/checkout@v6
 

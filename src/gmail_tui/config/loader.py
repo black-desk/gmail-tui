@@ -5,6 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 """
 
 import logging
+import os
 
 import yaml
 from xdg import xdg_config_dirs, xdg_config_home
@@ -16,7 +17,7 @@ _config: Config | None = None
 
 
 def get_config() -> Config:
-    """Load configuration from user config file or use default.
+    """Load configuration from environment, user config file or use default.
 
     Returns:
         Config: Configuration object
@@ -25,6 +26,19 @@ def get_config() -> Config:
     if _config is not None:
         return _config
 
+    # Check for GMAIL_TUI_CONFIG environment variable first
+    config_path = os.getenv("GMAIL_TUI_CONFIG")
+    if config_path:
+        try:
+            config_file = config_path
+            with open(config_file) as f:
+                config_data = yaml.safe_load(f)
+                if config_data:
+                    return Config(config_data)
+        except Exception as e:
+            logging.warning("Failed to load config from GMAIL_TUI_CONFIG %s: %s", config_path, e)
+
+    # Otherwise, search XDG config directories
     for config_dir in [xdg_config_home(), *xdg_config_dirs()]:
         config_file = config_dir / "gmail-tui" / "config.yaml"
         if config_file.exists():

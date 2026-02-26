@@ -10,10 +10,6 @@ from datetime import datetime
 from email.header import decode_header
 from typing import Any
 
-from imapclient import IMAPClient
-
-ADDRESS_TUPLE_MIN_LENGTH = 4
-
 
 def decode_mime_words(s: str | None) -> str:
     """Decode MIME encoded-word strings.
@@ -147,7 +143,12 @@ class EmailMetadata:
         internal_date: datetime,
         message: email.message.Message,
         size: int,
-        flags: list[Any] | None = None,
+        flags: list[str] | None = None,
+        from_addr: str | None = None,
+        to_addr: str | None = None,
+        cc_addr: str | None = None,
+        message_id: str | None = None,
+        in_reply_to: str | None = None,
     ) -> EmailMetadata:
         """Create EmailMetadata from an email message.
 
@@ -164,30 +165,26 @@ class EmailMetadata:
         """
         metadata = cls(uid=uid, internal_date=internal_date, size=size)
         if flags:
-            metadata.flags = [
-                flag.decode() if isinstance(flag, bytes) else str(flag)
-                for flag in flags
-            ]
+            metadata.flags = flags
 
-        # Basic fields
+        # Use pre-parsed headers from imap-tools if provided
+        metadata.from_addr = from_addr or decode_mime_words(message["from"])
+        metadata.to_addr = to_addr or decode_mime_words(message["to"])
+        metadata.cc_addr = cc_addr or (
+            decode_mime_words(message["cc"]) if message["cc"] else None
+        )
+
+        # Basic fields from message
         if message["subject"]:
             metadata.subject = decode_mime_words(message["subject"])
-        if message["from"]:
-            metadata.from_addr = decode_mime_words(message["from"])
-        if message["to"]:
-            metadata.to_addr = decode_mime_words(message["to"])
         if message["date"]:
             metadata.date = message["date"]
 
         # Optional fields
-        if message["cc"]:
-            metadata.cc_addr = decode_mime_words(message["cc"])
         if message["bcc"]:
             metadata.bcc_addr = decode_mime_words(message["bcc"])
-        if message["message-id"]:
-            metadata.message_id = message["message-id"]
-        if message["in-reply-to"]:
-            metadata.in_reply_to = message["in-reply-to"]
+        metadata.message_id = message_id or message.get("message-id")
+        metadata.in_reply_to = in_reply_to or message.get("in-reply-to")
         if message["references"]:
             metadata.references = message["references"]
 

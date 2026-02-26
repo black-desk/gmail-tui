@@ -10,6 +10,8 @@ from .imap import (
     connect_imap,
     fetch_email_metadata,
     get_imap_connection,
+    list_folders,
+    list_folders_client,
 )
 
 __all__ = [
@@ -18,4 +20,16 @@ __all__ = [
     "connect_imap",
     "fetch_email_metadata",
     "get_imap_connection",
+    "list_folders",
+    "list_folders_client",
+]
+
+__all__ = [
+    "close_all_imap_connections",
+    "close_imap_connection",
+    "connect_imap",
+    "fetch_email_metadata",
+    "get_imap_connection",
+    "list_folders",
+    "list_folders_client",
 ]

@@ -47,6 +47,19 @@ class Config:
         self.app_password = gmail_config["app_password"]
         self.bindings = data.get("bindings", {})
 
+        # IMAP server configuration (with defaults for Gmail)
+        # Check for separate imap section first (for test servers like smtp4dev)
+        imap_config = data.get("imap", {})
+        self.imap_server = imap_config.get("server", gmail_config.get("imap_server", "imap.gmail.com"))
+        self.imap_port = int(imap_config.get("port", gmail_config.get("imap_port", 993)))
+        self.imap_ssl = imap_config.get("ssl", gmail_config.get("imap_ssl", True))
+
+        # SMTP server configuration (optional)
+        smtp_config = data.get("smtp", {})
+        self.smtp_server = smtp_config.get("server")
+        self.smtp_port = smtp_config.get("port")
+        self.smtp_ssl = smtp_config.get("ssl")
+
 
 class ActionInfo(NamedTuple):
     """Action information."""

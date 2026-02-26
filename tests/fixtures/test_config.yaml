@@ -1,0 +1,19 @@
+# Test configuration for Gmail TUI E2E tests.
+# SPDX-FileCopyrightText: 2026 Chen Linxuan <me@black-desk.cn>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+gmail:
+  email: user
+  app_password: pass
+
+# IMAP server configuration for smtp4dev
+imap:
+  server: localhost
+  port: 143
+  ssl: false
+
+# SMTP server configuration for smtp4dev
+smtp:
+  server: localhost
+  port: 2525
+  ssl: false
