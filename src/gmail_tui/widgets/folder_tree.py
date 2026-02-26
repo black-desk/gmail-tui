@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 from textual import on, work
 from textual.app import ComposeResult
@@ -69,7 +69,7 @@ class FolderTree(Widget):
         super().__init__()
         self.tree_widget = Tree("Folders")
         self.tree_widget.show_root = False
-        self.tree_data: Optional[IMAPTree] = None
+        self.tree_data: IMAPTree | None = None
         self.email: str = ""
         self.app_password: str = ""
 
@@ -127,7 +127,7 @@ class FolderTree(Widget):
         self.loading = False
 
     def _build_tree_widget(
-        self, root: str = "", parent: Optional[TreeNode] = None
+        self, root: str = "", parent: TreeNode | None = None
     ) -> None:
         """Build the tree widget structure recursively.
 

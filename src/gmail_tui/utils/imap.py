@@ -5,7 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from imapclient import IMAPClient
 
@@ -133,7 +133,7 @@ def fetch_email_metadata(
     client: IMAPClient,
     folder: str,
     limit: int = 20,
-    search_criteria: Optional[list[str]] = None,
+    search_criteria: list[str] | None = None,
 ) -> list[EmailMetadata]:
     """Fetch email metadata from IMAP server.
 

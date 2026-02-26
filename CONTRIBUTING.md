@@ -38,7 +38,7 @@ This project follows the [REUSE Specification](https://reuse.software/spec/) for
    git clean -fdx
 
    # Run reuse lint
-   poetry run reuse lint
+   uv run reuse lint
    ```
 
 ## Development Process
@@ -51,33 +51,33 @@ This project follows the [REUSE Specification](https://reuse.software/spec/) for
 
 2. Install dependencies:
    ```bash
-   poetry install
+   uv sync --extra dev
    ```
 
 3. Run tests:
    ```bash
-   poetry run pytest
+   uv run pytest
    ```
 
 4. Format code:
    ```bash
-   poetry run ruff format .
+   uv run ruff format .
    ```
 
 5. Check code style:
    ```bash
-   poetry run ruff check .
+   uv run ruff check .
    ```
 
 6. Check for trailing whitespace:
    ```bash
-   poetry run python scripts/check_trailing_whitespace.py
+   uv run python scripts/check_trailing_whitespace.py
    ```
 
 7. Verify license compliance:
    ```bash
    git clean -fdx
-   poetry run reuse lint
+   uv run reuse lint
    ```
 
 ## Continuous Integration
@@ -103,9 +103,9 @@ For local development, make sure to run the same checks before submitting a pull
 
 ```bash
 # Run all checks
-poetry run python scripts/check_trailing_whitespace.py
-poetry run ruff format --check .
-poetry run ruff check .
-poetry run pytest
-poetry run reuse lint
+uv run python scripts/check_trailing_whitespace.py
+uv run ruff format --check .
+uv run ruff check .
+uv run pytest
+uv run reuse lint
 ```

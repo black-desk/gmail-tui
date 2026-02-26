@@ -106,8 +106,6 @@ dmypy.json
 # Rope project settings
 .ropeproject
 
-# Poetry
-.poetry/
 
 # Translation files
 *.mo 
