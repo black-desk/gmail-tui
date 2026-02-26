@@ -8,14 +8,14 @@ import email.message
 from dataclasses import dataclass, field
 from datetime import datetime
 from email.header import decode_header
-from typing import Any, Optional
+from typing import Any
 
 from imapclient import IMAPClient
 
 ADDRESS_TUPLE_MIN_LENGTH = 4
 
 
-def decode_mime_words(s: Optional[str]) -> str:
+def decode_mime_words(s: str | None) -> str:
     """Decode MIME encoded-word strings.
 
     Args:
@@ -39,7 +39,7 @@ def decode_mime_words(s: Optional[str]) -> str:
     return "".join(result)
 
 
-def format_address_list(addresses: Optional[list]) -> Optional[str]:
+def format_address_list(addresses: list | None) -> str | None:
     """Format an address list to a string representation.
 
     Args:
@@ -64,7 +64,7 @@ def format_address_list(addresses: Optional[list]) -> Optional[str]:
             name = address.name
             mailbox = address.mailbox
             host = address.host
-        elif isinstance(address, (list, tuple)) and len(address) >= (
+        elif isinstance(address, list | tuple) and len(address) >= (
             ADDRESS_TUPLE_MIN_LENGTH
         ):
             # Process tuple format (name, host_route, mailbox, host)
@@ -105,22 +105,22 @@ class EmailMetadata:
 
     uid: int
     internal_date: datetime
-    subject: Optional[str] = None
-    from_addr: Optional[str] = None
-    to_addr: Optional[str] = None
-    cc_addr: Optional[str] = None
-    bcc_addr: Optional[str] = None
-    date: Optional[str] = None
-    message_id: Optional[str] = None
-    in_reply_to: Optional[str] = None
-    references: Optional[str] = None
-    content_type: Optional[str] = None
-    content_disposition: Optional[str] = None
+    subject: str | None = None
+    from_addr: str | None = None
+    to_addr: str | None = None
+    cc_addr: str | None = None
+    bcc_addr: str | None = None
+    date: str | None = None
+    message_id: str | None = None
+    in_reply_to: str | None = None
+    references: str | None = None
+    content_type: str | None = None
+    content_disposition: str | None = None
     size: int = 0
     flags: list[str] = field(default_factory=list)
 
     @classmethod
-    def from_imap_data(cls, uid: int, data: dict) -> "EmailMetadata":
+    def from_imap_data(cls, uid: int, data: dict) -> EmailMetadata:
         """Create EmailMetadata from IMAP data with RFC822.
 
         Args:
@@ -147,8 +147,8 @@ class EmailMetadata:
         internal_date: datetime,
         message: email.message.Message,
         size: int,
-        flags: Optional[list[Any]] = None,
-    ) -> "EmailMetadata":
+        flags: list[Any] | None = None,
+    ) -> EmailMetadata:
         """Create EmailMetadata from an email message.
 
         Args:
@@ -198,7 +198,7 @@ class EmailMetadata:
         return metadata
 
     @classmethod
-    def from_envelope_data(cls, uid: int, data: dict) -> "EmailMetadata":
+    def from_envelope_data(cls, uid: int, data: dict) -> EmailMetadata:
         """Create EmailMetadata from IMAP ENVELOPE data.
 
         Args:
@@ -264,7 +264,7 @@ class EmailMetadata:
         return metadata
 
     def fetch_full_email(
-        self, client: IMAPClient, folder: Optional[str] = None
+        self, client: IMAPClient, folder: str | None = None
     ) -> email.message.Message:
         """Fetch the full email content when needed.
 

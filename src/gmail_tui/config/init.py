@@ -5,7 +5,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
 """
 
 import logging
-from typing import Optional
 
 import yaml
 from xdg import xdg_config_home
@@ -14,8 +13,8 @@ from .default import DEFAULT_CONFIG
 
 
 def init_config(
-    email: Optional[str] = None,
-    app_password: Optional[str] = None,
+    email: str | None = None,
+    app_password: str | None = None,
 ) -> None:
     """Initialize user configuration file.
 

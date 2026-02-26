@@ -22,13 +22,13 @@ This project is not yet available on PyPI. You can install it directly from GitH
 # Install with pip from GitHub
 pip install git+https://github.com/black-desk/gmail-tui.git
 
-# Install with Poetry from GitHub
-poetry add git+https://github.com/black-desk/gmail-tui.git
+# Install with uv from GitHub
+uv pip install git+https://github.com/black-desk/gmail-tui.git
 
 # Or clone the repository and install locally
 git clone https://github.com/black-desk/gmail-tui.git
 cd gmail-tui
-poetry install
+uv sync --extra dev
 ```
 
 ## Usage

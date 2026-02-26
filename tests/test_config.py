@@ -19,7 +19,7 @@ from gmail_tui.config.types import Config
 
 
 @pytest.fixture
-def temp_config_dir() -> Generator[Path, None, None]:
+def temp_config_dir() -> Generator[Path]:
     """Create a temporary configuration directory.
 
     Returns:
