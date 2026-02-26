@@ -1,0 +1,9 @@
+From: bob@example.com
+To: test@localhost
+Subject: [PATCH] Fix memory leak
+Message-ID: <patch001@lists.example.com>
+Date: Thu, 28 Feb 2026 09:00:00 +0000
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+This is a patch email.

@@ -24,7 +24,7 @@ class OutputFormat(Enum):
     TOML = auto()
 
     @classmethod
-    def from_str(cls, s: str) -> OutputFormat:
+    def from_str(cls, s: str) -> "OutputFormat":
         """Create OutputFormat from string.
 
         Args:

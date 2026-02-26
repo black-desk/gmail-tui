@@ -1,0 +1,12 @@
+From: maintainer@example.com
+To: test@localhost
+Cc: maintainer@example.com
+Subject: Re: [PATCH] Fix memory leak
+Message-ID: <applied001@lists.example.com>
+In-Reply-To: <review001@lists.example.com>
+References: <patch001@lists.example.com> <review001@lists.example.com>
+Date: Thu, 28 Feb 2026 09:00:00 +0000
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Applied this patch.

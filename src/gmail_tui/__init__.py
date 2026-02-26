@@ -11,6 +11,9 @@ import argparse
 from gmail_tui.app import main as app
 from gmail_tui.commands.init import InitCommand
 from gmail_tui.commands.list import ListCommand
+from gmail_tui.commands.mkdir import MkdirCommand
+from gmail_tui.commands.mv import MvCommand
+from gmail_tui.commands.rm import RmCommand
 from gmail_tui.commands.tree import TreeCommand
 
 
@@ -26,6 +29,9 @@ def main() -> None:
         InitCommand(),
         ListCommand(),
         TreeCommand(),
+        MkdirCommand(),
+        RmCommand(),
+        MvCommand(),
     ]
 
     for command in commands:
