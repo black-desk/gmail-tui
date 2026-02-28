@@ -44,9 +44,5 @@ jobs:
       run: |
         uv run ruff check .
 
-    - name: Run unit tests
-      run: |
-        uv run pytest tests/ -k "not e2e"
-
-    - name: Run e2e tests
-      run: bash scripts/run_e2e_tests.sh -v
+    - name: Run tests
+      run: bash scripts/run_tests.sh -v

@@ -10,7 +10,7 @@ import sys
 from gmail_tui.commands.base import Command
 from gmail_tui.config import get_config
 from gmail_tui.imap_tree import IMAPTree
-from gmail_tui.utils import get_imap_connection, list_folders_client
+from gmail_tui.utils import get_imap_connection, list_folders
 
 
 class TreeCommand(Command):
@@ -47,7 +47,7 @@ class TreeCommand(Command):
             with get_imap_connection(
                 username=config.email, password=config.app_password
             ) as client:
-                folders = list_folders_client(client)
+                folders = list_folders(client)
                 if not folders:
                     sys.stdout.write("No folders found\n")
                     return

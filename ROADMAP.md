@@ -17,6 +17,7 @@ The primary use case is reading emails from open-source project mailing lists.
 |---------|-------------|
 | `gmail-tui init` | Initialize configuration |
 | `gmail-tui ls [folder]` | List emails in folder |
+| `gmail-tui show <uid>` | Display full email content (supports uid or message-id) |
 | `gmail-tui tree` | Display folder tree |
 | `gmail-tui mkdir <folder>` | Create a new folder |
 | `gmail-tui mv <src> <dest>` | Move or rename folder |
@@ -26,7 +27,6 @@ The primary use case is reading emails from open-source project mailing lists.
 
 | Command | Description | Status |
 |---------|-------------|--------|
-| `gmail-tui show <uid>` | Display full email content (supports uid or message-id) | ❌ |
 | `gmail-tui threads [folder]` | List threads (grouped by conversation) | ❌ |
 | `gmail-tui thread <message-id>` | Display all emails in a thread (any message-id in the thread) | ❌ |
 | `gmail-tui search <query>` | Search emails by sender/subject/content | ❌ |

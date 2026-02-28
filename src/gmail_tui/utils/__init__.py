@@ -13,7 +13,6 @@ from .imap import (
     fetch_email_metadata,
     get_imap_connection,
     list_folders,
-    list_folders_client,
     rename_folder,
 )
 
@@ -26,6 +25,5 @@ __all__ = [
     "fetch_email_metadata",
     "get_imap_connection",
     "list_folders",
-    "list_folders_client",
     "rename_folder",
 ]

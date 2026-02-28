@@ -14,6 +14,7 @@ from gmail_tui.commands.list import ListCommand
 from gmail_tui.commands.mkdir import MkdirCommand
 from gmail_tui.commands.mv import MvCommand
 from gmail_tui.commands.rm import RmCommand
+from gmail_tui.commands.show import ShowCommand
 from gmail_tui.commands.tree import TreeCommand
 
 
@@ -28,6 +29,7 @@ def main() -> None:
     commands = [
         InitCommand(),
         ListCommand(),
+        ShowCommand(),
         TreeCommand(),
         MkdirCommand(),
         RmCommand(),

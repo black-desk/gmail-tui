@@ -53,7 +53,7 @@ sleep 3
 echo "Running E2E tests..."
 
 set +e
-timeout --foreground $TIMEOUT uv run pytest tests/test_e2e.py "$@"
+timeout --foreground $TIMEOUT uv run pytest tests "$@"
 EXIT_CODE=$?
 set -e
 
