@@ -28,16 +28,22 @@ def temp_config_dir() -> Generator[Path]:
     """
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
-        # Save original environment variable
+        # Save original environment variables
         original_xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
-        # Set test configuration directory
+        original_gmail_tui_config = os.environ.get("GMAIL_TUI_CONFIG")
+        # Set test configuration directory and clear GMAIL_TUI_CONFIG
         os.environ["XDG_CONFIG_HOME"] = str(temp_path)
+        os.environ.pop("GMAIL_TUI_CONFIG", None)
         yield temp_path
-        # Restore original environment variable
+        # Restore original environment variables
         if original_xdg_config_home is None:
             os.environ.pop("XDG_CONFIG_HOME", None)
         else:
             os.environ["XDG_CONFIG_HOME"] = original_xdg_config_home
+        if original_gmail_tui_config is None:
+            os.environ.pop("GMAIL_TUI_CONFIG", None)
+        else:
+            os.environ["GMAIL_TUI_CONFIG"] = original_gmail_tui_config
 
 
 def test_load_default_config(temp_config_dir: Path) -> None:

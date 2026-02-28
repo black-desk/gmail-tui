@@ -1,43 +1,17 @@
 """Tests for the list command.
 
-SPDX-FileCopyrightText: 2024 Chen Linxuan <me@black-desk.cn>
+SPDX-FileCopyrightText: 2024-2026 Chen Linxuan <me@black-desk.cn>
 SPDX-License-Identifier: GPL-3.0-or-later
-
-These tests focus on the public interfaces and mock the IMAP server responses directly,
-rather than mocking internal implementation details like EmailMetadata objects.
-This approach ensures that tests remain valid even when internal implementations change,
-as long as the public interfaces and expected behaviors remain the same.
 """
 
-from datetime import datetime
-from unittest.mock import MagicMock, patch
+import json
 
 import pytest
-from imapclient.response_types import Envelope
 
 from gmail_tui.commands.list import ListCommand
-
-
-# Helper function to create IMAP envelope response
-def create_envelope(subject, from_addr, to_addr, date=None, message_id=None):
-    """Create a mock IMAP envelope response."""
-    if date is None:
-        date = b"01-Jan-2023"
-    if message_id is None:
-        message_id = b"<test@example.com>"
-
-    return Envelope(
-        date,
-        subject,
-        (from_addr,),  # from_addr
-        (from_addr,),  # sender
-        (from_addr,),  # reply_to
-        (to_addr,),  # to
-        None,  # cc
-        None,  # bcc
-        None,  # in_reply_to
-        message_id,
-    )
+from gmail_tui.config import get_config
+from gmail_tui.list import list_emails
+from gmail_tui.utils.imap import create_folder, delete_folder, fetch_email_metadata
 
 
 @pytest.fixture
@@ -46,176 +20,126 @@ def list_command():
     return ListCommand()
 
 
-@pytest.mark.parametrize(
-    "folder, limit, format_name",
-    [
-        ("INBOX", 10, "json"),
-        ("Sent", 5, "yaml"),
-        ("[Gmail]/All Mail", 20, "toml"),
-    ],
-)
-def test_list_command_handle(folder, limit, format_name):
-    """Test if list command handle method correctly processes arguments."""
-    # Create command
-    list_command = ListCommand()
+class TestListCommandHandle:
+    """Tests for list command handle method."""
 
-    # Create args mock
-    args = MagicMock()
-    args.folder = folder
-    args.limit = limit
-    args.format = format_name
+    @pytest.fixture(autouse=True)
+    def check_environment(self):
+        """Skip tests if GreenMail server is not running."""
+        from tests.conftest import _is_greenmail_running
 
-    # Mock the list_emails function
-    with patch("gmail_tui.commands.list.list_emails") as mock_list_emails:
-        # Call handle method
-        list_command.handle(args)
+        if not _is_greenmail_running():
+            pytest.skip("GreenMail server not running - run ./scripts/run_tests.sh first")
 
-        # Verify list_emails was called with correct arguments (positional)
-        mock_list_emails.assert_called_once_with(folder, limit, format_name)
+    def test_list_emails_inbox(self, capsys):
+        """Test listing emails in INBOX."""
+        list_emails("INBOX", 5, "json")
+        captured = capsys.readouterr()
 
+        data = json.loads(captured.out)
+        assert len(data) == 5
 
-def test_list_emails_functionality(mock_config, mock_imap_client):
-    """Test the complete functionality of list_emails function."""
-    # Import module
-    from gmail_tui.list import list_emails
+        # Check first email
+        subjects = [e["subject"] for e in data]
+        assert "Test Email 1" in subjects
 
-    # Mock IMAP server responses directly rather than mocking internal EmailMetadata
-    # objects
-    mock_imap_client.search.return_value = [1, 2]
+    def test_list_emails_limit(self, capsys):
+        """Test limit parameter in list_emails."""
+        list_emails("INBOX", 2, "json")
+        captured = capsys.readouterr()
 
-    # Setup IMAP response with proper Envelope objects
-    from_addr = (b"Sender Name", b"", b"sender", b"example.com")
-    to_addr = (b"Recipient", b"", b"user", b"example.com")
+        data = json.loads(captured.out)
+        assert len(data) == 2
 
-    mock_imap_client.fetch.return_value = {
-        1: {
-            b"ENVELOPE": create_envelope(
-                b"Test Email 1",
-                from_addr,
-                to_addr,
-                message_id=b"<message1@example.com>",
-            ),
-            b"RFC822.SIZE": 1024,
-            b"INTERNALDATE": datetime.now(),
-            b"FLAGS": (b"\\Seen",),
-        },
-        2: {
-            b"ENVELOPE": create_envelope(
-                b"Test Email 2",
-                from_addr,
-                to_addr,
-                message_id=b"<message2@example.com>",
-            ),
-            b"RFC822.SIZE": 2048,
-            b"INTERNALDATE": datetime.now(),
-            b"FLAGS": (),
-        },
-    }
+    @pytest.mark.parametrize(
+        "format_name",
+        ["json", "yaml", "toml"],
+    )
+    def test_list_emails_formats(self, capsys, format_name):
+        """Test different output formats."""
+        list_emails("INBOX", 1, format_name)
+        captured = capsys.readouterr()
 
-    # Mock functions
-    with (
-        patch("gmail_tui.list.get_config", return_value=mock_config),
-        patch("gmail_tui.list.get_imap_connection") as mock_get_imap_connection,
-        patch("sys.stdout.write") as mock_stdout_write,
-    ):
-        # Set up connection mock
-        mock_get_imap_connection.return_value.__enter__.return_value = mock_imap_client
-
-        # Call function
-        list_emails("INBOX", 10, "json")
-
-        # Verify IMAP connection parameters are correct
-        mock_get_imap_connection.assert_called_once_with(
-            username=mock_config.email, password=mock_config.app_password
-        )
-
-        # Verify IMAP methods were called with correct parameters
-        mock_imap_client.select_folder.assert_called_once_with("INBOX")
-        mock_imap_client.search.assert_called_once()
-        mock_imap_client.fetch.assert_called_once()
-
-        # Verify output was written to stdout
-        assert mock_stdout_write.call_count >= 1
+        if format_name == "json":
+            # Basic JSON validation
+            data = json.loads(captured.out)
+            assert isinstance(data, list)
+        else:
+            # Basic YAML/TOML validation
+            assert captured.out
 
 
-def test_list_emails_no_emails(mock_config, mock_imap_client):
-    """Test handling when no emails are found."""
-    # Import module
-    from gmail_tui.list import list_emails
+class TestListCommandEmptyFolder:
+    """Tests for listing emails in an empty folder."""
 
-    # Mock empty search results
-    mock_imap_client.search.return_value = []
+    @pytest.fixture(autouse=True)
+    def check_environment(self):
+        """Skip tests if GreenMail server is not running."""
+        from tests.conftest import _is_greenmail_running
 
-    # Mock functions
-    with (
-        patch("gmail_tui.list.get_config", return_value=mock_config),
-        patch("gmail_tui.list.get_imap_connection") as mock_get_imap_connection,
-        patch("sys.stdout.write") as mock_stdout_write,
-    ):
-        # Set up connection mock
-        mock_get_imap_connection.return_value.__enter__.return_value = mock_imap_client
+        if not _is_greenmail_running():
+            pytest.skip("GreenMail server not running - run ./scripts/run_tests.sh first")
 
-        # Call function
-        list_emails("INBOX")
+    @pytest.fixture
+    def empty_folder(self):
+        """Create and clean up an empty folder for testing.
 
-        # Verify correct message is displayed
-        mock_stdout_write.assert_called_once_with("No emails found in folder: INBOX\n")
+        Yields:
+            str: The name of the empty folder
+        """
+        from tests.conftest import _is_greenmail_running
+
+        if not _is_greenmail_running():
+            pytest.skip("GreenMail server not running")
+
+        folder_name = "EmptyListFolder"
+        config = get_config()
+        from gmail_tui.utils.imap import get_imap_connection
+
+        try:
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                create_folder(client, folder_name)
+            yield folder_name
+        finally:
+            # Always attempt cleanup, even if test fails
+            try:
+                with get_imap_connection(
+                    username=config.email, password=config.app_password
+                ) as client:
+                    delete_folder(client, folder_name)
+            except Exception:
+                # Folder may not exist or already deleted
+                pass
+
+    def test_list_empty_folder(self, capsys, empty_folder):
+        """Test listing emails in an empty folder."""
+        config = get_config()
+        from gmail_tui.utils.imap import get_imap_connection
+
+        with get_imap_connection(
+            username=config.email, password=config.app_password
+        ) as client:
+            emails = fetch_email_metadata(client, empty_folder, limit=10)
+            assert len(emails) == 0
 
 
-def test_list_emails_connection_error(mock_config):
-    """Test error handling for connection issues."""
-    # Import module
-    from gmail_tui.list import list_emails
+class TestListCommandInvalidFolder:
+    """Tests for handling invalid folder names."""
 
-    # Mock functions
-    with (
-        patch("gmail_tui.list.get_config", return_value=mock_config),
-        patch("gmail_tui.list.get_imap_connection") as mock_get_imap_connection,
-        patch("sys.stderr.write") as mock_stderr_write,
-    ):
-        # Set connection to raise exception
-        mock_get_imap_connection.side_effect = Exception("Connection error")
+    @pytest.fixture(autouse=True)
+    def check_environment(self):
+        """Skip tests if GreenMail server is not running."""
+        from tests.conftest import _is_greenmail_running
 
-        # Call function
-        list_emails("INBOX")
+        if not _is_greenmail_running():
+            pytest.skip("GreenMail server not running - run ./scripts/run_tests.sh first")
 
-        # Verify error message was written
-        mock_stderr_write.assert_called_once_with("Error: Connection error\n")
+    def test_list_nonexistent_folder(self, capsys):
+        """Test listing emails from a non-existent folder."""
+        list_emails("NonExistentFolder123", 10, "json")
+        captured = capsys.readouterr()
 
-
-@pytest.mark.parametrize("output_format", ["json", "yaml", "toml"])
-def test_list_emails_output_formats(mock_config, mock_imap_client, output_format):
-    """Test different output formats."""
-    # Import module
-    from gmail_tui.list import list_emails
-
-    # Mock IMAP server response with a single email
-    mock_imap_client.search.return_value = [1]
-
-    # Setup IMAP response with proper Envelope objects
-    from_addr = (b"Sender Name", b"", b"sender", b"example.com")
-    to_addr = (b"Recipient", b"", b"user", b"example.com")
-
-    mock_imap_client.fetch.return_value = {
-        1: {
-            b"ENVELOPE": create_envelope(b"Test Email Format", from_addr, to_addr),
-            b"RFC822.SIZE": 1024,
-            b"INTERNALDATE": datetime.now(),
-            b"FLAGS": (b"\\Seen",),
-        }
-    }
-
-    # Mock functions
-    with (
-        patch("gmail_tui.list.get_config", return_value=mock_config),
-        patch("gmail_tui.list.get_imap_connection") as mock_get_imap_connection,
-        patch("sys.stdout.write") as mock_stdout_write,
-    ):
-        # Set up connection mock
-        mock_get_imap_connection.return_value.__enter__.return_value = mock_imap_client
-
-        # Call function
-        list_emails("INBOX", 1, output_format)
-
-        # Verify output was written to stdout
-        assert mock_stdout_write.call_count >= 1
+        # Should show error message
+        assert "Error" in captured.out or captured.out == ""

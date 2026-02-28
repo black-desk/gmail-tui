@@ -1,0 +1,16 @@
+From: bob@example.com
+To: test@localhost
+Subject: Re: Let's discuss the feature
+Message-ID: <thread02@lists.example.com>
+In-Reply-To: <thread01@lists.example.com>
+References: <thread01@lists.example.com>
+Date: Thu, 28 Feb 2026 10:05:00 +0000
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Hi Alice,
+
+Great idea! I think we should focus on the API design first.
+
+Best,
+Bob

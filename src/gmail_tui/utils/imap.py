@@ -52,16 +52,20 @@ class IMAPConnectionManager:
 
 
 def connect_imap(username: str, password: str) -> IMAPClient:
-    """Connect to Gmail IMAP server.
+    """Connect to IMAP server.
 
     Args:
-        username: Gmail address
-        password: App password for Gmail
+        username: Email address
+        password: Password for IMAP server
 
     Returns:
         IMAPClient object
 
     """
+    from gmail_tui.config import get_config
+
+    config = get_config()
+
     # Check if connection exists in the pool
     connection_key = (username, password)
     if connection_key in _imap_connections:
@@ -76,7 +80,10 @@ def connect_imap(username: str, password: str) -> IMAPClient:
             del _imap_connections[connection_key]
 
     # Create new connection
-    client = IMAPClient("imap.gmail.com")
+    if config.imap_ssl:
+        client = IMAPClient(config.imap_server, port=config.imap_port, ssl=True)
+    else:
+        client = IMAPClient(config.imap_server, port=config.imap_port, ssl=False)
     client.login(username, password)
 
     # Store in connection pool
@@ -154,10 +161,11 @@ def fetch_email_metadata(
     # Search for messages
     messages = client.search(search_criteria)
 
-    # Optimization: only fetch email metadata, not the full content
-    # Use ENVELOPE for basic info, RFC822.SIZE for size, INTERNALDATE for date
+    # Optimization: fetch ENVELOPE for basic info, plus BODY.PEEK[HEADER]
+    # to get In-Reply-To and References headers that ENVELOPE doesn't populate
     fetch_data = client.fetch(
-        messages, ["ENVELOPE", "INTERNALDATE", "RFC822.SIZE", "FLAGS"]
+        messages,
+        ["ENVELOPE", "INTERNALDATE", "RFC822.SIZE", "FLAGS", "BODY.PEEK[HEADER]"],
     )
 
     # Sort messages by date in descending order
@@ -167,6 +175,87 @@ def fetch_email_metadata(
 
     # Convert to EmailMetadata objects
     return [
-        EmailMetadata.from_envelope_data(uid=uid, data=data)
+        EmailMetadata.from_envelope_data(
+            uid=uid, data=data, header_data=data.get(b"BODY[HEADER]")
+        )
         for uid, data in sorted_messages[:limit]
     ]
+
+
+def create_folder(client: IMAPClient, folder_name: str) -> bool:
+    """Create a new folder.
+
+    Args:
+        client: IMAPClient object
+        folder_name: Name of the folder to create
+
+    Returns:
+        True if successful, False otherwise
+
+    """
+    try:
+        client.create_folder(folder_name)
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to create folder {folder_name}: {e}")
+        return False
+
+
+def delete_folder(client: IMAPClient, folder_name: str) -> bool:
+    """Delete a folder.
+
+    Args:
+        client: IMAPClient object
+        folder_name: Name of the folder to delete
+
+    Returns:
+        True if successful, False otherwise
+
+    """
+    try:
+        client.delete_folder(folder_name)
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to delete folder {folder_name}: {e}")
+        return False
+
+
+def rename_folder(client: IMAPClient, old_name: str, new_name: str) -> bool:
+    """Rename a folder.
+
+    Args:
+        client: IMAPClient object
+        old_name: Current folder name
+        new_name: New folder name
+
+    Returns:
+        True if successful, False otherwise
+
+    """
+    try:
+        client.rename_folder(old_name, new_name)
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to rename folder {old_name} to {new_name}: {e}")
+        return False
+
+
+def list_folders(client: IMAPClient) -> list[tuple[list[bytes], bytes, bytes]]:
+    """List all folders in mailbox.
+
+    Args:
+        client: IMAPClient object
+
+    Returns:
+        List of folder tuples (flags, delimiter, name)
+
+    """
+    try:
+        folders = []
+        for flags, delimiter, name in client.list_folders():
+            # delimiter and name are already bytes, no need to encode
+            folders.append((flags, delimiter, name))
+        return folders
+    except Exception as e:
+        logger.warning(f"Failed to list folders: {e}")
+        return []

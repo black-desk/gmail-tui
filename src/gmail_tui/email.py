@@ -120,7 +120,7 @@ class EmailMetadata:
     flags: list[str] = field(default_factory=list)
 
     @classmethod
-    def from_imap_data(cls, uid: int, data: dict) -> EmailMetadata:
+    def from_imap_data(cls, uid: int, data: dict) -> "EmailMetadata":
         """Create EmailMetadata from IMAP data with RFC822.
 
         Args:
@@ -148,7 +148,7 @@ class EmailMetadata:
         message: email.message.Message,
         size: int,
         flags: list[Any] | None = None,
-    ) -> EmailMetadata:
+    ) -> "EmailMetadata":
         """Create EmailMetadata from an email message.
 
         Args:
@@ -198,12 +198,15 @@ class EmailMetadata:
         return metadata
 
     @classmethod
-    def from_envelope_data(cls, uid: int, data: dict) -> EmailMetadata:
+    def from_envelope_data(
+        cls, uid: int, data: dict, header_data: bytes | None = None
+    ) -> "EmailMetadata":
         """Create EmailMetadata from IMAP ENVELOPE data.
 
         Args:
             uid: Message UID
             data: IMAP data containing ENVELOPE, INTERNALDATE and RFC822.SIZE
+            header_data: Optional raw header bytes for parsing headers not in ENVELOPE
 
         Returns:
             EmailMetadata object
@@ -254,12 +257,27 @@ class EmailMetadata:
                 else str(envelope.message_id)
             )
 
+        # Process in-reply-to (from ENVELOPE or headers)
         if envelope.in_reply_to:
-            metadata.in_reply_to = (
-                envelope.in_reply_to.decode()
-                if isinstance(envelope.in_reply_to, bytes)
-                else str(envelope.in_reply_to)
-            )
+            in_reply_to_list = envelope.in_reply_to
+            if in_reply_to_list and len(in_reply_to_list) > 0:
+                # Take the first message ID from the list
+                first_id = in_reply_to_list[0]
+                metadata.in_reply_to = (
+                    first_id.decode() if isinstance(first_id, bytes) else str(first_id)
+                )
+        elif header_data:
+            # Try to parse from headers if ENVELOPE doesn't have it
+            # GreenMail's ENVELOPE doesn't populate this field correctly
+            message = email.message_from_bytes(header_data)
+            if message["in-reply-to"]:
+                metadata.in_reply_to = decode_mime_words(message["in-reply-to"])
+
+        # Process references from headers (not in ENVELOPE structure)
+        if header_data:
+            message = email.message_from_bytes(header_data)
+            if message["references"]:
+                metadata.references = decode_mime_words(message["references"])
 
         return metadata
 
