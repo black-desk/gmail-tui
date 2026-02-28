@@ -22,15 +22,14 @@ The primary use case is reading emails from open-source project mailing lists.
 | `gmail-tui mkdir <folder>` | Create a new folder |
 | `gmail-tui mv <src> <dest>` | Move or rename folder |
 | `gmail-tui rm <folder>` | Delete a folder |
+| `gmail-tui threads [folder]` | List threads (grouped by conversation) |
+| `gmail-tui search <query>` | Search emails by sender/subject/content |
 
 ### Planned
 
 | Command | Description | Status |
 |---------|-------------|--------|
-| `gmail-tui threads [folder]` | List threads (grouped by conversation) | ❌ |
 | `gmail-tui thread <message-id>` | Display all emails in a thread (any message-id in the thread) | ❌ |
-| `gmail-tui search <query>` | Search emails by sender/subject/content | ❌ |
-| `gmail-tui search --address <email>` | Find threads involving an address (from/to/cc) | ❌ |
 
 ### CLI Arguments Design
 
