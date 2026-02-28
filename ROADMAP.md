@@ -24,12 +24,12 @@ The primary use case is reading emails from open-source project mailing lists.
 | `gmail-tui rm <folder>` | Delete a folder |
 | `gmail-tui threads [folder]` | List threads (grouped by conversation) |
 | `gmail-tui search <query>` | Search emails by sender/subject/content |
+| `gmail-tui thread <message-id>` | Display all emails in a thread (any message-id in the thread) |
 
 ### Planned
 
 | Command | Description | Status |
 |---------|-------------|--------|
-| `gmail-tui thread <message-id>` | Display all emails in a thread (any message-id in the thread) | ❌ |
 
 ### CLI Arguments Design
 

@@ -21,7 +21,7 @@ from gmail_tui.utils.imap import (
 
 # Test constants
 FOLDER_MIN_FIELDS = 3
-EXPECTED_EMAIL_COUNT = 5
+EXPECTED_EMAIL_COUNT = 8
 LIMIT_EMAIL_COUNT = 2
 
 

@@ -17,6 +17,7 @@ from gmail_tui.commands.rm import RmCommand
 from gmail_tui.commands.search import SearchCommand
 from gmail_tui.commands.show import ShowCommand
 from gmail_tui.commands.threads import ThreadsCommand
+from gmail_tui.commands.thread import ThreadCommand
 from gmail_tui.commands.tree import TreeCommand
 
 
@@ -38,6 +39,7 @@ def main() -> None:
         MvCommand(),
         SearchCommand(),
         ThreadsCommand(),
+        ThreadCommand(),
     ]
 
     for command in commands:
