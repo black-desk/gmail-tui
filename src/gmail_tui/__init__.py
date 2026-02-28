@@ -14,6 +14,7 @@ from gmail_tui.commands.list import ListCommand
 from gmail_tui.commands.mkdir import MkdirCommand
 from gmail_tui.commands.mv import MvCommand
 from gmail_tui.commands.rm import RmCommand
+from gmail_tui.commands.search import SearchCommand
 from gmail_tui.commands.show import ShowCommand
 from gmail_tui.commands.tree import TreeCommand
 
@@ -34,6 +35,7 @@ def main() -> None:
         MkdirCommand(),
         RmCommand(),
         MvCommand(),
+        SearchCommand(),
     ]
 
     for command in commands:
