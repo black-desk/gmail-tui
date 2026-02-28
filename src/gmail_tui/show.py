@@ -294,8 +294,8 @@ def show_email(
                     sys.stderr.write(f"Error: Failed to fetch email with UID {uid}\n")
                     return
 
-                # Create message object
-                message = email.message_from_bytes(fetch_data[uid][b"RFC822"])
+                # Create message object using EmailMessage class for get_body support
+                message = email.message_from_bytes(fetch_data[uid][b"RFC822"], policy=email.policy.default)
             else:
                 # Message-ID lookup
                 message_id = parsed_id
@@ -313,8 +313,8 @@ def show_email(
                     sys.stderr.write(f"Error: Failed to fetch email with Message-ID <{message_id}>\n")
                     return
 
-                # Create message object
-                message = email.message_from_bytes(fetch_data[uid][b"RFC822"])
+                # Create message object using EmailMessage class for get_body support
+                message = email.message_from_bytes(fetch_data[uid][b"RFC822"], policy=email.policy.default)
 
             # Format and output
             if fmt == OutputFormat.RAW:

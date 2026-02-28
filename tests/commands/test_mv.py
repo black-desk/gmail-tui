@@ -4,11 +4,11 @@ SPDX-FileCopyrightText: 2026 Chen Linxuan <me@black-desk.cn>
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 from gmail_tui.commands.mv import MvCommand
+from gmail_tui.config import get_config
+from gmail_tui.utils.imap import create_folder, delete_folder, list_folders, rename_folder
 
 
 @pytest.fixture
@@ -17,43 +17,183 @@ def mv_command():
     return MvCommand()
 
 
-def test_mv_command_handle(mv_command, mock_config):
-    """Test mv command correctly handles source and dest arguments."""
-    with (
-        patch("gmail_tui.commands.mv.get_config", return_value=mock_config),
-        patch("gmail_tui.commands.mv.get_imap_connection") as mock_get_imap_connection,
-        patch(
-            "gmail_tui.commands.mv.rename_folder", return_value=True
-        ) as mock_rename_folder,
-    ):
-        mock_conn = MagicMock()
-        mock_get_imap_connection.return_value.__enter__.return_value = mock_conn
+class TestMvCommand:
+    """Tests for mv command."""
 
-        args = MagicMock()
-        args.source = "OldFolder"
-        args.dest = "NewFolder"
-        mv_command.handle(args)
+    @pytest.fixture(autouse=True)
+    def check_environment(self):
+        """Skip tests if GreenMail server is not running."""
+        from tests.conftest import _is_greenmail_running
 
-        mock_get_imap_connection.assert_called_once_with(
-            username=mock_config.email, password=mock_config.app_password
-        )
-        mock_rename_folder.assert_called_once()
+        if not _is_greenmail_running():
+            pytest.skip("GreenMail server not running - run ./scripts/run_tests.sh first")
+
+    def test_mv_simple_rename(self):
+        """Test renaming a simple folder."""
+        old_name = "OldTestFolder"
+        new_name = "NewTestFolder"
+
+        config = get_config()
+        from gmail_tui.utils.imap import get_imap_connection
+
+        try:
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                # Create the original folder
+                create_folder(client, old_name)
+
+                # Rename the folder
+                result = rename_folder(client, old_name, new_name)
+                assert result is True
+
+                # Verify rename happened
+                folders = list_folders(client)
+                folder_names = [
+                    f[2].decode() if isinstance(f[2], bytes) else str(f[2]) for f in folders
+                ]
+                assert old_name not in folder_names
+                assert new_name in folder_names
+        finally:
+            # Cleanup
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                for folder in [old_name, new_name]:
+                    try:
+                        delete_folder(client, folder)
+                    except Exception:
+                        pass
+
+    def test_mv_nested_folder(self):
+        """Test renaming a nested folder."""
+        old_name = "Work/OldProject"
+        new_name = "Work/NewProject"
+
+        config = get_config()
+        from gmail_tui.utils.imap import get_imap_connection
+
+        try:
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                # Create the original folder (parent created automatically by Greenmail)
+                create_folder(client, old_name)
+
+                # Rename the folder
+                result = rename_folder(client, old_name, new_name)
+                assert result is True
+
+                # Verify rename happened
+                folders = list_folders(client)
+                folder_names = [
+                    f[2].decode() if isinstance(f[2], bytes) else str(f[2]) for f in folders
+                ]
+                assert old_name not in folder_names
+                assert new_name in folder_names
+        finally:
+            # Cleanup
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                for folder in [old_name, new_name]:
+                    try:
+                        delete_folder(client, folder)
+                    except Exception:
+                        pass
+
+    def test_mv_move_to_different_hierarchy(self):
+        """Test moving a folder to a different hierarchy."""
+        old_name = "TestMoveFolder"
+        new_name = "Archived/TestMoveFolder"
+
+        config = get_config()
+        from gmail_tui.utils.imap import get_imap_connection
+
+        try:
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                # Create the original folder
+                create_folder(client, old_name)
+
+                # Move/rename the folder
+                result = rename_folder(client, old_name, new_name)
+                assert result is True
+
+                # Verify move happened
+                folders = list_folders(client)
+                folder_names = [
+                    f[2].decode() if isinstance(f[2], bytes) else str(f[2]) for f in folders
+                ]
+                assert old_name not in folder_names
+                assert new_name in folder_names
+        finally:
+            # Cleanup
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                for folder in [old_name, new_name]:
+                    try:
+                        delete_folder(client, folder)
+                    except Exception:
+                        pass
 
 
-def test_mv_connection_error(mv_command, mock_config):
-    """Test mv command handles connection errors."""
-    with (
-        patch("gmail_tui.commands.mv.get_config", return_value=mock_config),
-        patch("gmail_tui.commands.mv.get_imap_connection") as mock_get_imap_connection,
-        patch("sys.stderr.write") as mock_stderr_write,
-        patch("sys.exit") as mock_exit,
-    ):
-        mock_get_imap_connection.side_effect = Exception("Connection error")
+class TestMvCommandErrorHandling:
+    """Tests for mv command error handling."""
 
-        args = MagicMock()
-        args.source = "OldFolder"
-        args.dest = "NewFolder"
-        mv_command.handle(args)
+    @pytest.fixture(autouse=True)
+    def check_environment(self):
+        """Skip tests if GreenMail server is not running."""
+        from tests.conftest import _is_greenmail_running
 
-        mock_stderr_write.assert_called_once_with("Error: Connection error\n")
-        mock_exit.assert_called_once_with(1)
+        if not _is_greenmail_running():
+            pytest.skip("GreenMail server not running - run ./scripts/run_tests.sh first")
+
+    def test_mv_nonexistent_folder(self):
+        """Test moving a non-existent folder."""
+        old_name = "NonExistentFolder"
+        new_name = "NewName"
+
+        config = get_config()
+        from gmail_tui.utils.imap import get_imap_connection
+
+        with get_imap_connection(
+            username=config.email, password=config.app_password
+        ) as client:
+            # Try to rename non-existent folder
+            result = rename_folder(client, old_name, new_name)
+            # Should return False for non-existent folder
+            assert result is False
+
+    def test_mv_to_existing_name(self):
+        """Test moving to a folder name that already exists."""
+        old_name = "Folder1"
+        new_name = "Folder2"
+
+        config = get_config()
+        from gmail_tui.utils.imap import get_imap_connection
+
+        try:
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                # Create both folders
+                create_folder(client, old_name)
+                create_folder(client, new_name)
+
+                # Try to rename to existing name
+                result = rename_folder(client, old_name, new_name)
+                # Should return False for duplicate name
+                assert result is False
+        finally:
+            # Cleanup
+            with get_imap_connection(
+                username=config.email, password=config.app_password
+            ) as client:
+                for folder in [old_name, new_name]:
+                    try:
+                        delete_folder(client, folder)
+                    except Exception:
+                        pass

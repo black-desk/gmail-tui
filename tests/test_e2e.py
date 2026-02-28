@@ -33,10 +33,10 @@ def _skip_if_no_test_config():
 
 def _skip_if_server_not_running():
     """Skip test if test server is not running."""
-    from .conftest import _is_test_server_running
+    from .conftest import _is_greenmail_running
 
-    if not _is_test_server_running():
-        pytest.skip("Test server not running")
+    if not _is_greenmail_running():
+        pytest.skip("GreenMail server not running")
 
 
 class TestIMAPConnection:
@@ -48,7 +48,7 @@ class TestIMAPConnection:
         _skip_if_no_test_config()
         _skip_if_server_not_running()
 
-    def test_list_folders(self, smtp4dev_server: dict) -> None:  # noqa: ARG002
+    def test_list_folders(self, greenmail_server) -> None:  # noqa: ARG002
         """Test listing folders."""
         config = get_config()
         with get_imap_connection(
